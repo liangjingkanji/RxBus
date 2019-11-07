@@ -1,6 +1,5 @@
 ## 特点
 
--   支持粘性事件
 -   支持标签
 -   无需注册注销
 -   支持线程切换
@@ -9,6 +8,10 @@
 -   代码量最少
 
 
+
+不支持粘性事件, 建议自己序列化到本地来控制, 市面上的粘性事件基本上都是属于全局变量, 在意外销毁的时候会导致数据丢失引发空指针异常.
+
+不支持注解, 因为我认为函数比注解更加方便而且代码量更少也不存在任何性能影响, 以及便于数据共享. 
 
 ## 安装
 
@@ -28,7 +31,7 @@ allprojects {
 module of build.gradle
 
 ```groovy
-implementation 'com.github.liangjingkanji:RxBus:1.0'
+implementation 'com.github.liangjingkanji:RxBus:1.1'
 ```
 
 
@@ -97,25 +100,9 @@ fun LifecycleOwner.observerTag(
 
 
 
-## 粘性事件
+如果你不在Activity或者Frament中观察, 可以使用`receiveTag|receiveEvent`这两个函数, 他们返回`Disposable`用于手动注销观察者.
 
-示例
-
-```kotlin
-sendEvent(Model(1))
-
-getEvent<Model>()?.let {
-	// get data 
-}
-```
+使用方法一致
 
 
-
-函数
-
-```kotlin
-fun setEvent(event: Any?)
-
-inline fun <reified T> getEvent(): T?
-```
 

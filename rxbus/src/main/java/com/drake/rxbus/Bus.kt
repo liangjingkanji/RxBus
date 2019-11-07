@@ -4,17 +4,17 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import io.reactivex.Scheduler
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
-import java.util.concurrent.ConcurrentHashMap
 
-val bus = PublishSubject.create<Any>().toSerialized()
-val stickyEvents = ConcurrentHashMap<Class<*>, Any>()
+
+val _bus = PublishSubject.create<Any>().toSerialized()
 
 // <editor-fold desc="Send Event">
 
 fun sendEvent(event: Any) {
-    bus.onNext(event)
+    _bus.onNext(event)
 }
 
 fun sendTag(tag: String) {
@@ -34,7 +34,8 @@ inline fun <reified T> LifecycleOwner.observerEvent(
     noinline block: T.() -> Unit
 ) {
 
-    val disposable = bus.ofType(T::class.java).observeOn(scheduler).subscribe(block)
+    val disposable =
+        _bus.ofType(T::class.java).observeOn(scheduler).onTerminateDetach().subscribe(block)
 
     lifecycle.addObserver(object : LifecycleEventObserver {
         override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
@@ -53,10 +54,11 @@ fun LifecycleOwner.observerTag(
     block: String.() -> Unit
 ) {
 
-    val disposable = bus.ofType(BusEvent::class.java)
+    val disposable = _bus.ofType(BusEvent::class.java)
         .filter { tags.contains(it.tag) }
         .map { it.tag }
         .observeOn(scheduler)
+        .onTerminateDetach()
         .subscribe(block)
 
     lifecycle.addObserver(object : LifecycleEventObserver {
@@ -68,24 +70,27 @@ fun LifecycleOwner.observerTag(
     })
 }
 
-// </editor-fold>
 
+inline fun <reified T> receiveEvent(
+    scheduler: Scheduler = Schedulers.trampoline(),
+    noinline block: T.() -> Unit
+): Disposable {
 
-// <editor-fold desc="Sticky Event">
-
-fun setEvent(event: Any?) {
-    event?.let {
-        stickyEvents[event.javaClass] = event
-    }
+    return _bus.ofType(T::class.java).observeOn(scheduler).onTerminateDetach().subscribe(block)
 }
 
+fun receiveTag(
+    vararg tags: String,
+    scheduler: Scheduler = Schedulers.trampoline(),
+    block: String.() -> Unit
+): Disposable {
 
-inline fun <reified T> getEvent(): T? {
-    return try {
-        stickyEvents.remove(T::class.java) as T
-    } catch (e: Exception) {
-        null
-    }
+    return _bus.ofType(BusEvent::class.java)
+        .filter { tags.contains(it.tag) }
+        .map { it.tag }
+        .observeOn(scheduler)
+        .onTerminateDetach()
+        .subscribe(block)
 }
 
 // </editor-fold>
