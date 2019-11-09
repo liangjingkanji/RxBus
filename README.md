@@ -31,7 +31,7 @@ allprojects {
 module of build.gradle
 
 ```groovy
-implementation 'com.github.liangjingkanji:RxBus:1.1'
+implementation 'com.github.liangjingkanji:RxBus:1.0.1'
 ```
 
 
