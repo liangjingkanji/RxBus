@@ -38,4 +38,6 @@ dependencies {
     implementation project(path: ':rxbus')
 
     implementation 'com.github.liangjingkanji:debugkit:1.2.9'
+
+    implementation 'com.github.liangjingkanji:Tooltip:1.0'
 }
