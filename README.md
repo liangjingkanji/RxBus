@@ -51,11 +51,11 @@ sendEvent(event, "refresh_event")
 ## 观察事件
 
 ```kotlin
-observerEvent<Model> {
+observeEvent<Model> {
 	// 事件回调
 }
 
-observerEvent<Model>("标签") {
+observeEvent<Model>("标签") {
 	// 事件回调
 }
 ```
@@ -70,7 +70,7 @@ observerEvent<Model>("标签") {
 函数
 
 ```kotlin
-inline fun <reified T> LifecycleOwner.observerEvent(
+inline fun <reified T> LifecycleOwner.observeEvent(
     vararg tags: String,
     scheduler: Scheduler = Schedulers.trampoline(),
     lifecycleEvent: Lifecycle.Event = Lifecycle.Event.ON_DESTROY,
@@ -101,7 +101,7 @@ sendEvent(123123, "refresh_event")
 
 
 // 接受标签事件
-observerTag("refresh_event", "finish_event"){
+observeTag("refresh_event", "finish_event"){
 	when(this){
         "refresh_event" -> {}
         else -> {}
@@ -116,7 +116,7 @@ observerTag("refresh_event", "finish_event"){
 ```kotlin
 fun sendTag(tag: String)
 
-fun LifecycleOwner.observerTag(
+fun LifecycleOwner.observeTag(
     vararg tags: String,
     scheduler: Scheduler = Schedulers.trampoline(),
     lifecycleEvent: Lifecycle.Event = Lifecycle.Event.ON_DESTROY,
