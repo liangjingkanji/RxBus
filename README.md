@@ -1,3 +1,5 @@
+如果你的项目存在Kotlin推荐使用[Channel](https://github.com/liangjingkanji/Channel)
+
 ## 特点
 
 -   支持标签
